@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "konva": "^9.3.6"
+  },
+  "devDependencies": {
+    "daisyui": "^4.10.2"
+  }
+}
