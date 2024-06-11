@@ -10,36 +10,40 @@ defmodule CanvasCombatWeb.DrawLive.Index do
     {:ok, stream(socket, :draws, [])}
   end
 
-  def handle_params(%{"game_id" => game_id, "role" => role} = _params, _uri, socket) do
+  def handle_params(%{"game_id" => game_id} = _params, _uri, socket) do
     if connected?(socket), do: subscribe(game_id)
-
-    if role == "starter" do
-      {:ok, _pid} =
-        DynamicSupervisor.start_child(
-          CanvasCombat.GameSupervisor,
-          {LobbyServer, name: via_tuple(game_id), game_phase: "default", players: []}
-        )
-    end
 
     socket =
       socket
-      |> assign_game(game_id, role)
+      |> assign_game(game_id)
 
     {:noreply, socket}
   end
 
-  defp assign_game(socket, game_id, role) do
+  defp assign_game(socket, game_id) do
     socket
-    |> assign(game_id: game_id, role: role)
+    |> assign(game_id: game_id)
     |> assign_game()
   end
 
-  defp assign_game(%{assigns: %{game_id: game_id, role: role}} = socket) do
-    game = GenServer.call(via_tuple(game_id), :game)
-    IO.inspect(game)
+  defp assign_game(%{assigns: %{game_id: game_id}} = socket) do
+    try do
+      game = GenServer.call(via_tuple(game_id), :game)
+      IO.inspect(game)
+      assign(socket, state: game)
+    catch
+      :exit, _ ->
+        {:ok, _pid} =
+          DynamicSupervisor.start_child(
+            CanvasCombat.GameSupervisor,
+            {LobbyServer,
+             name: via_tuple(game_id), game_phase: CanvasCombat.GamePhase.new(), players: []}
+          )
 
-    socket
-    |> assign(state: game)
+        game = GenServer.call(via_tuple(game_id), :game)
+        IO.inspect(game)
+        assign(socket, state: game)
+    end
   end
 
   def subscribe(game_id) do

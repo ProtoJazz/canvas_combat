@@ -17,7 +17,7 @@ defmodule CanvasCombatWeb.Router do
   scope "/", CanvasCombatWeb do
     pipe_through :browser
 
-    get "/", PageController, :home
+    live "/", LandingPageLive.Index, :index
     live "/draws", DrawLive.Index, :index
   end
 
