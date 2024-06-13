@@ -1,5 +1,6 @@
 defmodule CanvasCombatWeb.Router do
   use CanvasCombatWeb, :router
+  alias CanvasCombatWeb.Plugs.UserPlug
 
   pipeline :browser do
     plug :accepts, ["html"]
@@ -8,6 +9,7 @@ defmodule CanvasCombatWeb.Router do
     plug :put_root_layout, html: {CanvasCombatWeb.Layouts, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+    plug UserPlug
   end
 
   pipeline :api do

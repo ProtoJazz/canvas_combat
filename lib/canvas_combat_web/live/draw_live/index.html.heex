@@ -1,4 +1,9 @@
 <h1><%= @state.game_phase %></h1>
+<%= if @state.leader == @user_id do %>
+  <h3 style="color: red;">Player: <%= @user_id %></h3>
+<% else %>
+  <h3>Player: <%= @user_id %></h3>
+<% end %>
 <div id="main_drawing_container" phx-hook="Drawing">
   Tool:
   <select id="tool">

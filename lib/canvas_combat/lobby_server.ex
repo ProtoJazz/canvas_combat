@@ -7,7 +7,9 @@ defmodule CanvasCombat.LobbyServer do
   @timeout 600_000
 
   def start_link(options) do
-    GenServer.start_link(__MODULE__, %GameState{}, options)
+    IO.inspect(options)
+    initial_state = %GameState{} |> Map.merge(Map.new(options))
+    GenServer.start_link(__MODULE__, initial_state, options)
   end
 
   def state(%CanvasCombat.LobbyServer{state: state}) do

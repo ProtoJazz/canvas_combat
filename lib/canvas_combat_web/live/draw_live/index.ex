@@ -5,9 +5,9 @@ defmodule CanvasCombatWeb.DrawLive.Index do
   alias CanvasCombat.Game.Draw
 
   @impl true
-  def mount(_params, _session, socket) do
+  def mount(_params, %{"user_id" => user_id} = _session, socket) do
     Process.send_after(self(), :timer, 30_000)
-    {:ok, stream(socket, :draws, [])}
+    {:ok, assign(socket, user_id: user_id)}
   end
 
   def handle_params(%{"game_id" => game_id} = _params, _uri, socket) do
@@ -26,7 +26,7 @@ defmodule CanvasCombatWeb.DrawLive.Index do
     |> assign_game()
   end
 
-  defp assign_game(%{assigns: %{game_id: game_id}} = socket) do
+  defp assign_game(%{assigns: %{game_id: game_id, user_id: user_id}} = socket) do
     try do
       game = GenServer.call(via_tuple(game_id), :game)
       IO.inspect(game)
@@ -37,7 +37,10 @@ defmodule CanvasCombatWeb.DrawLive.Index do
           DynamicSupervisor.start_child(
             CanvasCombat.GameSupervisor,
             {LobbyServer,
-             name: via_tuple(game_id), game_phase: CanvasCombat.GamePhase.new(), players: []}
+             name: via_tuple(game_id),
+             game_phase: CanvasCombat.GamePhase.new(),
+             players: [user_id],
+             leader: user_id}
           )
 
         game = GenServer.call(via_tuple(game_id), :game)
