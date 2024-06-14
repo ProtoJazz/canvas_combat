@@ -1,14 +1,36 @@
 <h1><%= @state.game_phase %></h1>
-<%= if @state.leader == @user_id do %>
-  <h3 style="color: red;">Player: <%= @user_id %></h3>
-<% else %>
-  <h3>Player: <%= @user_id %></h3>
+
+<%= if @state.game_phase == :lobby  do %>
+  <% disabled = @state.leader != @user_id %>
+  <button class="btn btn-primary" disabled={disabled} phx-click="StartGame">WeinerButton</button>
+
+  <div class="form-control">
+    <label class="label cursor-pointer">
+      <span class="label-text">Button One</span>
+      <input type="checkbox" disabled={disabled} class="toggle" checked />
+    </label>
+    <label class="label cursor-pointer">
+      <span class="label-text">Horse Wee</span>
+      <input type="checkbox" disabled={disabled} class="toggle" checked />
+    </label>
+    <label class="label cursor-pointer">
+      <span class="label-text">Bilateral Fog</span>
+      <input type="checkbox" disabled={disabled} class="toggle" checked />
+    </label>
+    <label class="label cursor-pointer">
+      <span class="label-text">Depth perception but for smell</span>
+      <input type="checkbox" disabled={disabled} class="toggle" checked />
+    </label>
+  </div>
 <% end %>
-<div id="main_drawing_container" phx-hook="Drawing">
-  Tool:
-  <select id="tool">
-    <option value="brush">Brush</option>
-    <option value="eraser">Eraser</option>
-  </select>
-  <div id="container"></div>
-</div>
+
+<%= if @state.game_phase == :draw  do %>
+  <div id="main_drawing_container" phx-hook="Drawing">
+    Tool:
+    <select id="tool">
+      <option value="brush">Brush</option>
+      <option value="eraser">Eraser</option>
+    </select>
+    <div id="container"></div>
+  </div>
+<% end %>

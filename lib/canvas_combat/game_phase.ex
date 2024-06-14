@@ -5,9 +5,5 @@ defmodule CanvasCombat.GamePhase do
 
   @type t :: :lobby | :draw | :write | :duel | :end
 
-  def new(), do: :setup
-
-  def next(:setup), do: :play
-  def next(:play), do: :end
-  def next(:end), do: :setup
+  def new(), do: :lobby
 end

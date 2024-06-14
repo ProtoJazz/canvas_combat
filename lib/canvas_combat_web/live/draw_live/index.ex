@@ -1,6 +1,5 @@
 defmodule CanvasCombatWeb.DrawLive.Index do
   use CanvasCombatWeb, :live_view
-
   alias CanvasCombat.LobbyServer
   alias CanvasCombat.Game.Draw
 
@@ -40,6 +39,7 @@ defmodule CanvasCombatWeb.DrawLive.Index do
              name: via_tuple(game_id),
              game_phase: CanvasCombat.GamePhase.new(),
              players: [user_id],
+             game_id: game_id,
              leader: user_id}
           )
 
@@ -60,6 +60,15 @@ defmodule CanvasCombatWeb.DrawLive.Index do
   def handle_info(:timer, socket) do
     # Handle the :timer message and trigger the event on your page
     {:noreply, push_event(socket, "DrawingDone", %{})}
+  end
+
+  def handle_event("StartGame", _params, %{assigns: %{user_id: user_id, state: state}} = socket) do
+    if(user_id == state.leader) do
+      GenServer.call(via_tuple(socket.assigns.game_id), :start_game)
+      :ok = Phoenix.PubSub.broadcast(CanvasCombat.PubSub, socket.assigns.game_id, :update)
+    end
+
+    {:noreply, socket}
   end
 
   def handle_event("DrawingSubmit", %{"drawing" => drawing} = params, socket) do
